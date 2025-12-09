@@ -1,1 +1,318 @@
+LAPORAN UAS SISTEM OPERASI
+Nama 		: DWI INDAH REVALINA
+Kelas 		: SI A
+NIM		: 05301425011
+Tugas UAS (1)
+C:users\lenovo>D:
+D:\>echo @echo off > recovery.bat(command untuk membuat notepad script)
+ https://drive.google.com/drive/folders/1CRNhD3CG-jpFxEA2T_g9nZJpeRwZYa3T
+@echo off
+echo MEMULAI PROSES DATA RECOVERY...
+echo ================================
 
+set sumber=%USERPROFILE%\Desktop\simulasidriveD
+set tujuan=%USERPROFILE%\Desktop\SimulasiDrive_C
+
+:: Membuat folder backup dengan timestamp sederhana
+set backup_folder=DataRecovery_%date:/=-%_%time::=-%
+mkdir "%tujuan%\%backup_folder%"
+
+echo Sumber  : %sumber%
+echo Tujuan : %tujuan%\%backup_folder%
+echo.
+
+echo Proses menyalin data...
+xcopy "%sumber%" "%tujuan%\%backup_folder%" /E /H /C /I /Y > "%tujuan%\%backup_folder%\recovery_log.txt"
+
+echo ================================
+echo RECOVERY SELESAI
+echo Log tersimpan di recovery_log.txt
+pause
+
+(merupakan script yang akan di ketikan di dalam notepad)
+https://drive.google.com/drive/folders/1fVLm9yU2Xd9EjIb0_cTlXiALPpwbca3Z
+(output yang akan muncul saat kita menjalankan script dalam notepad)
+https://drive.google.com/drive/folders/1TZ1SlxNwXdgXdhf-mstDWQqSr9b6JOTW
+(hasil recovery dari script yang sudah kita jalankan)
+Tugas UAS (2)
+C:\Users\lenovo>D:
+D:\>echo @echo off > modif.bat (comand untuk membuat notepad script)
+
+ https://drive.google.com/drive/folders/1f4oNVXuOwhbJDL_47L86ISUEepTKJEMw
+(file notepad yang dihasilkan melalui comand prompt)
+@echo off
+setlocal enabledelayedexpansion
+
+echo MEMULAI PROSES BACKUP DATA...
+echo ==============================
+
+set "sumber=%USERPROFILE%\Desktop\simulasidriveD"
+set "tujuan=%USERPROFILE%\Desktop\SimulasiDrive_Backup"
+
+:: Membuat folder backup dengan timestamp
+for /f "tokens=1-4 delims=/: " %%a in ("%date% %time%") do (
+    set "datetime=%%d-%%b-%%a_%%c-%%d-%%e"
+)
+set "backup_folder=Backup_%datetime%"
+mkdir "%tujuan%\%backup_folder%"
+
+echo Sumber  : %sumber%
+echo Tujuan  : %tujuan%\%backup_folder%
+echo.
+
+REM Inisialisasi counter dan log file
+set /a count=0
+set "logFile=%tujuan%\%backup_folder%\backup_log.txt"
+echo Proses backup dimulai pada %date% %time% > "%logFile%"
+
+echo Menyalin file .pdf dan .docx...
+
+REM Loop untuk backup file .pdf dan .docx
+for /r "%sumber%" %%f in (*.pdf *.docx) do (
+    set /a count+=1
+    set "srcfile=%%f"
+    set "filename=%%~nxf"
+
+    REM Copy file ke folder backup
+    copy /y "%%f" "%tujuan%\%backup_folder%\!filename!" >nul
+
+    REM Verifikasi ukuran file sumber dan tujuan
+    for %%A in ("%%f") do set "sizeSrc=%%~zA"
+    for %%B in ("%tujuan%\%backup_folder%\!filename!") do set "sizeDest=%%~zB"
+
+    if !sizeSrc! EQU !sizeDest! (
+        echo !count!. !filename! - Copy berhasil, Ukuran: !sizeDest! bytes
+        echo !count!. !filename! - Copy berhasil, Ukuran: !sizeDest! bytes >> "%logFile%"
+    ) else (
+        echo !count!. !filename! - Gagal copy!
+        echo !count!. !filename! - Gagal copy! >> "%logFile%"
+    )
+
+    REM Progress bar (dot setiap file)
+    <nul set /p=.
+)
+
+echo.
+echo Total file yang disalin: %count%
+echo ==============================
+echo Backup selesai pada %date% %time% >> "%logFile%"
+
+REM Compress hasil backup ke file ZIP dengan powershell
+set "zipFile=%tujuan%\Backup_%datetime%.zip"
+powershell Compress-Archive -Path "%tujuan%\%backup_folder%\*" -DestinationPath "%zipFile%" -Force
+
+echo Backup telah dikompresi ke:
+echo %zipFile%
+
+pause
+
+(script yang akan kita ketikan di dalam notepad untuk dijalankan)
+ 
+(output yang akan muncul saat script dijalankan)
+https://drive.google.com/drive/folders/1lIsjRYtDjdQMwDSNBowhGfUBGwd3f_nk
+ 
+(folder yang telah di backup lalu di kompres menjadi zip yang dihasilkan melalui script)
+
+https://drive.google.com/drive/folders/1f4oNVXuOwhbJDL_47L86ISUEepTKJEMw
+Tugas UAS (3)
+C:\Users\edward>D:
+D:\>echo @echo off > uas3.bat (comand untuk membuat notepad script)
+
+ 
+(file notepad yang akan di isi script yang telah dibuat dari command prompt)
+https://drive.google.com/drive/folders/1tYRe2qAzTCjHk4yoh8wMs4o2GuGo1WeT
+@echo off
+title ALL-IN-ONE BACKUP SYSTEM
+setlocal enabledelayedexpansion
+
+REM ================================
+REM KONFIGURASI EMAIL (EDIT BAGIAN INI)
+REM ================================
+set EMAIL_TO=sisforb25@gmail.com
+set EMAIL_FROM=edwardjayadi1616@gmail.com
+set EMAIL_PASS=zgbp odbb dkic ichn
+
+REM ================================
+REM LOKASI BACKUP
+REM ================================
+set SRC=%USERPROFILE%\Desktop\SimulasiDriveD
+set DST=%USERPROFILE%\Desktop\BackupResults
+mkdir "%DST%" 2>nul
+
+:MENU
+cls
+echo ==============================================
+echo           ALL-IN-ONE BACKUP SYSTEM
+echo ==============================================
+echo 1. Selective Backup
+echo 2. Incremental Backup
+echo 3. Scheduled Backup
+echo 4. Exit
+echo ==============================================
+set /p pilih=Pilih menu (1-4): 
+
+if "%pilih%"=="1" goto SELECTIVE
+if "%pilih%"=="2" goto INCREMENTAL
+if "%pilih%"=="3" goto SCHEDULE
+if "%pilih%"=="4" exit
+
+goto MENU
+
+
+
+REM ============================================================
+REM 1) SELECTIVE BACKUP
+REM ============================================================
+:SELECTIVE
+cls
+echo SELECTIVE BACKUP
+echo ----------------------------------------------------
+echo Folder tersedia di: %SRC%
+dir "%SRC%" /b /ad
+echo ----------------------------------------------------
+set /p folder=Masukkan nama folder (atau * untuk semua): 
+
+set OUT=%DST%\Selective_%date:/=-%_%time::=-%
+mkdir "%OUT%"
+
+echo Menyalin folder: %folder%
+xcopy "%SRC%\%folder%" "%OUT%\%folder%" /E /H /C /I /Y >nul
+
+echo.
+echo Backup selesai. Lokasi: %OUT%
+
+REM ============== EMAIL NOTIF OTOMATIS ==============
+powershell -Command ^
+"Send-MailMessage -To '%EMAIL_TO%' -From '%EMAIL_FROM%' -Subject 'Selective Backup selesai' -Body 'Selective backup folder %folder% selesai. Output: %OUT%' -SmtpServer 'smtp.gmail.com' -Port 587 -UseSsl -Credential (New-Object System.Management.Automation.PSCredential('%EMAIL_FROM%',(ConvertTo-SecureString '%EMAIL_PASS%' -AsPlainText -Force)))"
+
+echo Email notifikasi terkirim!
+pause
+goto MENU
+
+
+
+REM ============================================================
+REM 2) INCREMENTAL BACKUP
+REM ============================================================
+:INCREMENTAL
+cls
+echo INCREMENTAL BACKUP
+echo ----------------------------------------------------
+
+set SNAP=%DST%\last_snapshot.txt
+set NEWSNAP=%DST%\new_snapshot.txt
+set OUT=%DST%\Incremental_%date:/=-%_%time::=-%
+mkdir "%OUT%" 2>nul
+
+echo Membuat snapshot baru...
+(for /r "%SRC%" %%f in (*.*) do echo %%~zf %%f) > "%NEWSNAP%"
+
+if not exist "%SNAP%" (
+    echo Snapshot pertama, melakukan FULL backup...
+    xcopy "%SRC%" "%OUT%" /E /H /C /I /Y >nul
+    copy "%NEWSNAP%" "%SNAP%" >nul
+
+    powershell -Command ^
+    "Send-MailMessage -To '%EMAIL_TO%' -From '%EMAIL_FROM%' -Subject 'Incremental Backup (Full) selesai' -Body 'Full backup pertama selesai. Output: %OUT%' -SmtpServer 'smtp.gmail.com' -Port 587 -UseSsl -Credential (New-Object PSCredential('%EMAIL_FROM%',(ConvertTo-SecureString '%EMAIL_PASS%' -AsPlainText -Force)))"
+
+    echo Email notifikasi terkirim!
+    pause
+    goto MENU
+)
+
+echo File yang berubah:
+echo.
+for /f "tokens=1,*" %%a in (%NEWSNAP%) do (
+    find "%%b" "%SNAP%" | find "%%a" >nul
+    if errorlevel 1 (
+        echo Updated: %%b
+        copy "%%b" "%OUT%" >nul
+    )
+)
+
+copy "%NEWSNAP%" "%SNAP%" >nul
+
+echo.
+echo Incremental backup selesai. Output: %OUT%
+
+REM ============== EMAIL NOTIF ==============
+powershell -Command ^
+"Send-MailMessage -To '%EMAIL_TO%' -From '%EMAIL_FROM%' -Subject 'Incremental Backup selesai' -Body 'Incremental backup selesai. Output: %OUT%' -SmtpServer 'smtp.gmail.com' -Port 587 -UseSsl -Credential (New-Object PSCredential('%EMAIL_FROM%',(ConvertTo-SecureString '%EMAIL_PASS%' -AsPlainText -Force)))"
+
+echo Email notifikasi terkirim!
+pause
+goto MENU
+
+
+
+REM ============================================================
+REM 3) SCHEDULED BACKUP
+REM ============================================================
+:SCHEDULE
+cls
+echo SCHEDULED BACKUP
+echo ----------------------------------------------------
+set /p menit=Backup otomatis setiap berapa menit? : 
+
+schtasks /create /tn "AutoBackupUAS" /sc minute /mo %menit% /tr "%~dp0BackupSystem_AllInOne.bat" /f
+
+echo Jadwal backup dibuat setiap %menit% menit.
+
+REM ============== EMAIL NOTIF ==============
+powershell -Command ^
+"Send-MailMessage -To '%EMAIL_TO%' -From '%EMAIL_FROM%' -Subject 'Scheduled Backup Dibuat' -Body 'Scheduled backup telah dibuat setiap %menit% menit.' -SmtpServer 'smtp.gmail.com' -Port 587 -UseSsl -Credential (New-Object PSCredential('%EMAIL_FROM%',(ConvertTo-SecureString '%EMAIL_PASS%' -AsPlainText -Force)))"
+
+echo Email notifikasi terkirim!
+pause
+goto MENU
+(script yang kita ketik di dalam notepad)
+ 
+(tampilan saat script dijalankan)
+ 
+(folder berhasil di backup dan notif berhasil dikirim)
+
+ https://drive.google.com/drive/folders/1eZe8FCVuGfAIoQhtM3mO7TF8wEXGFbdF
+(hasil folder yang telah di backup menggunakan script)
+ 
+ https://drive.google.com/drive/folders/19kWetTzvHD1bROhSySGaPwUKoEPAP4Ug
+(notif hasil backup selesai)
+
+Tugas UAS (4)
+ANALISIS & DOKUMENTASI
+Recovery Sistem & Backup Data
+1. Analisis Masalah
+A. Penyebab Umum Bluescreen (BSOD)
+1. Driver rusak atau tidak kompatibel.
+2. Kerusakan hardware (RAM, HDD/SSD, overheating).
+3. File sistem Windows corrupt.
+4. Infeksi malware atau ransomware.
+5. Overclocking berlebihan.
+B. Kenapa CMD masih bisa diakses saat Bluescreen?
+CMD masih bisa diakses melalui Windows Recovery Environment (WinRE) karena WinRE berjalan terpisah dari sistem utama. Walaupun Windows gagal boot, WinRE tetap dapat menjalankan Command Prompt untuk backup data, perbaikan boot, dan troubleshooting.
+2. Solusi Alternatif
+A. Alternatif Tools Recovery Data
+1. Recuva – pemulihan file sederhana.
+2. EaseUS Data Recovery – mendukung WinPE bootable.
+3. MiniTool Power Data Recovery – efektif untuk disk rusak.
+4. Disk Drill – mendukung banyak jenis file.
+5. TestDisk & PhotoRec – gratis dan powerful.
+B. Cloud Backup sebagai Pencegahan
+- OneDrive
+- Google Drive
+- Dropbox
+- iCloud
+- Mega.nz
+3. Best Practice Backup
+A. Strategi 3-2-1 Rule
+- 3 salinan data (1 asli + 2 backup).
+- 2 media berbeda.
+- 1 backup di lokasi berbeda (off-site).
+B. Automasi Backup Rutin
+Backup dapat diotomatisasi menggunakan Task Scheduler, Robocopy, File History, atau sinkronisasi cloud.
+Contoh perintah Robocopy:
+robocopy C:\Data D:\Backup\Data /MIR /R:1 /W:1
+4. Kesimpulan
+A. Pembelajaran dari Simulasi
+BSOD dapat disebabkan oleh kerusakan driver, hardware, atau file sistem. Walaupun Windows gagal boot, CMD di WinRE tetap dapat digunakan untuk recovery.
+B. Aplikasi di Dunia Nyata
+Backup 3-2-1 dan automasi backup sangat penting untuk menjaga keamanan data. Cloud backup membantu mencegah kehilangan data saat sistem mengalami kerusakan.
